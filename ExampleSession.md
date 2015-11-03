@@ -1,6 +1,4 @@
 
-Email:
-This is the ‘first draft’ of the data collection pipeline, meaning it can be used to go through all the steps and to produce results, but there’s plenty of stuff that’s inconsistent, inefficient, and some stuff that’s just wrong.  
 
 File:
 # Collection and reporting on SPEF data
@@ -16,6 +14,8 @@ mkdir pma
 mkdir pma/emails
 mkdir pma/issues
 
+## change directories to where you’ve got the git repo cloned
+cd ../phpmyadmin
 
 ## run before or after sloc snapshot, but not during… you’ll get results for wherever HEAD is, not the final month
 $ cp ../SPEFTools.rb/gllog.awk .
@@ -74,18 +74,32 @@ mv issues.csv pma
 cd pma/emails
 Note: I don’t have this automated… anyone want to write a shell script?
 ## Pull all of the email archive files for the period being studied… (2001… 2015 for phpMyAdmin, only 2014 shown here)
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-January.txt.gz
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-February.txt.gz
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-March.txt.gz
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-April.txt.gz
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-May.txt.gz
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-June.txt.gz
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-July.txt.gz
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-August.txt.gz
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-September.txt.gz
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-October.txt.gz
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-November.txt.gz
+
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-December.txt.gz
+
+gunzip pma/emails *.gz
 
 ## summarize the emails:
 ruby extract_email.rb pma/emails phpMyAdmin > pma/emails.csv
@@ -101,18 +115,14 @@ emails			issues			phpMyAdmin_cloc.sql
 
 ## Start R
 ## Run the R Code in SPEF_RCode.txt
+## If all is in order, it will generate three plots, as with the ggplot commands below...
 
-## Load packages (and install them, if need be)
-library(dplyr)
-library(lubridate)
-library(ggplot2)
-
-
-## Set working directory to your project data directory
-setwd("/Users/admin/github/SPEFTools.rb/pma")
-
-## Examples in SPEF_RCode.txt still need tweaking
-
-#$ plotting an outcome measure and some context factors
+## plot an outcome measure and some context factors
 ggplot(data=spdf[as.Date(spdf$ProjectMonth) %in% seq(from=as.Date("2001-04-01"), to=as.Date("2014-04-01"),by='month') & spdf$Factor %in% c("VDensity","Churn","Commits","Devs","SLOC"),]) + geom_line(aes(x=ProjectMonth,y=Value,group=Factor)) + facet_grid(Factor~.,scales="free_y") + theme(strip.text.y = element_text(angle=0))
+
+# plotting practice keyword counts from issues
+ggplot(data=pmaC[as.Date(projIssues$ProjectMonth) %in% seq(from=as.Date("2005-01-01"), to=as.Date("2014-04-01"),by='month'),],aes(x=ProjectMonth)) + geom_bar(aes(y=..count..,group=Practice),position=position_dodge()) + facet_grid(Practice~.) + theme_tufte() + theme(strip.text.y = element_text(angle=0))
+
+# plotting practice keyword counts from emails
+ggplot(data=pmaC[as.Date(projEmails$ProjectMonth) %in% seq(from=as.Date("2005-01-01"), to=as.Date("2014-04-01"),by='month'),],aes(x=ProjectMonth)) + geom_bar(aes(y=..count..,group=Practice),position=position_dodge()) + facet_grid(Practice~.) + theme_tufte() + theme(strip.text.y = element_text(angle=0))
 
