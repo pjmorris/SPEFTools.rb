@@ -1,0 +1,34 @@
+# Useful command lines for collecting project data
+
+# getting, summarizing commits
+
+ git log --pretty=format:"%h ; %ad ; %an ; %ae" --numstat --date=short  | awk -f ../gllog.awk |  awk '{ if (length($1) >= 6) print $0 }' > commits.txt
+
+# run this only after the git log command has finished, else the HEAD will be in the wrong place
+ruby ../SPEFTools.rb/extract_sloc.rb phpMyAdmin 2001 04 2015 11
+
+# formatting extracted sloc data via database 
+sqlite3  -init phpMyAdmin_cloc.sql
+sqlite> .backup phpMyAdmin_cloc_db
+sqlite> .quit
+
+# getting, summarizing issues
+
+for issue in `seq 1 1000`; do ruby get_git_issue.rb phpmyadmin/phpmyadmin pjmorris questionmenot3 $issue pma/issues; done;
+
+ruby extract_issue.rb phpMyAdmin pma/issues > pma/issues.csv
+
+# Add header line: 
+# ProjectMonth,EventDate,Project,Topic,Source,DocId,creator,assignee,
+
+# getting, summarizing emails
+mkdir pma/emails
+cd pma/emails
+wget https://lists.phpmyadmin.net/pipermail/developers/2014-January.txt.gz
+
+ruby extract_email.rb pma/emails phpMyAdmin > pma/emails.csv
+
+# Add header to emails.csv: 
+# ProjectMonth,Project,Topic,Source,DocId,reporter,creator,assignee
+
+
