@@ -10,10 +10,11 @@ We collect version control commits and source lines of code (sloc) snapshots, bu
 
 ## Preliminaries: create a directory to hold the project data
 In SPEFTools.rb… 
+```
 mkdir pma
 mkdir pma/emails
 mkdir pma/issues
-
+```
 ## change directories to where you’ve got the git repo cloned
 cd ../phpmyadmin
 
