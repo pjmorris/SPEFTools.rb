@@ -1,5 +1,6 @@
 # R Code for managing SPEF Context Factors, Practice Adherence, and Outcome Measures
 # Should there be a Jupyter notebook?
+# Rule to implement: have R code reference database tables in ‘standard’ schema, not csv’s
 
 # install.packages(‘dplyr’)
 library(dplyr)
@@ -23,7 +24,7 @@ dbname = "phpMyAdmin_cloc_db"
 #load_cloc <- function(dbname)
 #{
     clocdb <- src_sqlite(dbname)
-    cloct<- tbl(clocdb, sql("SELECT * FROM t"))
+    cloct<- tbl(clocdb, sql("SELECT * FROM t where Language in ('Java','Javascript,','Ruby','YAML','Bourne Shell','Bourne Again Shell') "))
     tdf <- as.data.frame(cloct,n=-1)
 
     # split column from cloc input into project name, project month
@@ -39,21 +40,19 @@ clocbyProjectMonth <- group_by(tdf,ProjectMonth)
 projSLOC <- summarize(clocbyProjectMonth,SLOC=sum(nCode))
 projSLOCRow <- summarize(clocbyProjectMonth,Factor="SLOC",Value=sum(nCode))
 
-projIssues <- read.csv("issues.csv",header=TRUE,row.names=NULL)
-projEmails <- read.csv("emails.csv",header=TRUE,row.names=NULL)
 
-projCommits <- read.csv("commits.txt",sep=";",col.names=c("hash","date","author","email","added","changed","pathname"))
-projCommits$date <- as.Date(projCommits$date)
-projCommits$ProjectMonth <- projectdate(projCommits$date)
-projCommits$added <- as.numeric(projCommits$added)
-projCommits$changed <- as.numeric(projCommits$changed)
-projCommits$author <- as.character(projCommits$author)
-projCommits$email <- as.character(projCommits$email)
+projCommitsData <- read.csv("commits.txt",sep=";",col.names=c("hash","date","author","email","added","changed","pathname"))
+projCommitsData$date <- as.Date(projCommitsData$date)
+projCommitsData$ProjectMonth <- projectdate(projCommitsData$date)
+projCommitsData$added <- as.numeric(projCommitsData$added)
+projCommitsData$changed <- as.numeric(projCommitsData$changed)
+projCommitsData$author <- as.character(projCommitsData$author)
+projCommitsData$email <- as.character(projCommitsData$email)
 
 
 # mdf <- projCommits
 
-CommitsByProjectMonth <- group_by(projCommits,ProjectMonth)
+CommitsByProjectMonth <- group_by(projCommitsData,ProjectMonth)
 projCommits <- as.data.frame(summarize(CommitsByProjectMonth,cfCommits=length(unique(hash))))
 projCommitsRow <- data.frame(ProjectMonth=projCommits$ProjectMonth,Factor="Commits",Value=projCommits$cfCommits)
 
@@ -103,6 +102,15 @@ spdf <- rbind(spdf,projDevsRow)
 projTimeline <- unique(as.data.frame(projCommits[c("ProjectMonth")],drop=FALSE))
 # Needs $ProjectMonth: projTimeline <- seq(from=as.Date("2001-05-01"), to=as.Date("2015-11-01"),by='month')
 
+
+# plotting practice keyword counts from issues
+projIssues <- read.csv("issues.csv",header=TRUE,row.names=NULL)
+ggplot(data=pmaC[as.Date(projIssues$ProjectMonth) %in% seq(from=as.Date("2005-01-01"), to=as.Date("2014-04-01"),by='month'),],aes(x=ProjectMonth)) + geom_bar(aes(y=..count..,group=Practice),position=position_dodge()) + facet_grid(Practice~.) + theme_tufte() + theme(strip.text.y = element_text(angle=0))
+
+# plotting practice keyword counts from emails
+projEmails <- read.csv("emails.csv",header=TRUE,row.names=NULL)
+ggplot(data=pmaC[as.Date(projEmails$ProjectMonth) %in% seq(from=as.Date("2005-01-01"), to=as.Date("2014-04-01"),by='month'),],aes(x=ProjectMonth)) + geom_bar(aes(y=..count..,group=Practice),position=position_dodge()) + facet_grid(Practice~.) + theme_tufte() + theme(strip.text.y = element_text(angle=0))
+
 # 
 # Proxy for publically-reported vulnerabilities: emails containing the security advisory abbreviation
 projEmails$N = 1
@@ -124,7 +132,7 @@ projVC$ProjectMonth <- as.Date(projVC$ProjectMonth)
 # computing a new Factor/Value combination from existing Factor/Values
 projCLOC$ProjectMonth <- as.Date(projCLOC$ProjectMonth)
 tmpSeries <- merge(projSLOC,projVC)
-tmpSeries$Value <- tmpSeries$Value/tmpSeries$SLOC
+tmpSeries$Value <- tmpSeries$Value/(tmpSeries$SLOC/1000)
 tmpSeries$Factor <- "VDensity"
 tmpSeries <- tmpSeries[c("ProjectMonth","Factor","Value")]
 # tmpSeries$ProjectMonth <- as.Date(tmpSeries$ProjectMonth)
@@ -134,9 +142,4 @@ spdf <- rbind(spdf,tmpSeries)
 # plotting an outcome measure and some context factors
 ggplot(data=spdf[as.Date(spdf$ProjectMonth) %in% seq(from=as.Date("2001-04-01"), to=as.Date("2014-04-01"),by='month') & spdf$Factor %in% c("VDensity","Churn","Commits","Devs","SLOC"),]) + geom_line(aes(x=ProjectMonth,y=Value,group=Factor)) + facet_grid(Factor~.,scales="free_y") + theme(strip.text.y = element_text(angle=0))
 
-# plotting practice keyword counts from issues
-ggplot(data=pmaC[as.Date(projIssues$ProjectMonth) %in% seq(from=as.Date("2005-01-01"), to=as.Date("2014-04-01"),by='month'),],aes(x=ProjectMonth)) + geom_bar(aes(y=..count..,group=Practice),position=position_dodge()) + facet_grid(Practice~.) + theme_tufte() + theme(strip.text.y = element_text(angle=0))
-
-# plotting practice keyword counts from emails
-ggplot(data=pmaC[as.Date(projEmails$ProjectMonth) %in% seq(from=as.Date("2005-01-01"), to=as.Date("2014-04-01"),by='month'),],aes(x=ProjectMonth)) + geom_bar(aes(y=..count..,group=Practice),position=position_dodge()) + facet_grid(Practice~.) + theme_tufte() + theme(strip.text.y = element_text(angle=0))
 
