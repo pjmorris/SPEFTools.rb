@@ -1,17 +1,4 @@
-require 'rubygems'
-require 'json'
-require 'Time'
-require 'csv'
-
-def get_content(issue)
-  parsed = JSON.parse(issue)
-  contents = parsed['content']
-  parsed['comments'].each do |c|
-    contents << c['content']
-  end
-return contents
-end
-
+# Keywords (implemented as regexps) for SPEF Practices
 module SPEF_Keywords
     # Keywords to match against our security, practice topics
     williams_security_terms = /crash|denial of service|access level|sizing issues|resource consumption|data loss|flood|integrity|overflow|null problem|overload|protection|leak/
@@ -54,7 +41,7 @@ module SPEF_Keywords
          ]
 end # module SPEF_Keywords
 
-require './SPEF_Keywords'
+# require 'SPEF_Keywords'
  
 # print line with project, date, source, creator, issue #, reporter, keywords, topic
 def write_data_row(d,project="phpMyAdmin",topic="",source="Bug Tracker")

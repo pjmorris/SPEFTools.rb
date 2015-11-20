@@ -32,14 +32,15 @@ Topics = [
          ]
  
 # print line with project, date, source, creator, issue #, reporter, keywords, topic
-def write_data_row(d_id,d_created_at,d_reportedBy,d_owner,project="phpMyAdmin",topic="",source="Bug Tracker",count,filename,d_content)
+def write_data_row(d_id,project_month,d_created_at,d_reportedBy,d_owner,project="phpMyAdmin",topic="",source="Bug Tracker",count,filename,d_content)
 
-  print d_created_at, ", ", project, ", ", topic, ", ",  source,  ", ", d_id, ", ",
+  print project_month, ", ", d_created_at, ", ", project, ", ", topic, ", ",  source,  ", ", d_id, ", ",
   d_reportedBy, ", ", d_owner, ", " , "\n" # d_content, ", ", count, ", ", filename
 end
 
 pathname = ARGV[0]
 project = ARGV[1]
+print "ProjectMonth,EventDate,Project,Practice,Source,DocId,creator,assignee,\n"
 Dir.foreach(pathname) do |filename|
 next if filename == '.' or filename == '..'
 count = 0
@@ -55,7 +56,7 @@ File.open(pathname + '/' + filename).each do |l|
     if count > 0
       Topics.map { |t| 
         if d_content.scan(t[:keywords]).length > 0
-          write_data_row(d_id,d_created_at,d_reportedBy,d_owner,project=project,t[:topic],source="email",count,filename,d_content)
+          write_data_row(d_id,project_month,d_created_at,d_reportedBy,d_owner,project=project,t[:topic],source="email",count,filename,d_content)
         end
       }
     end
@@ -74,8 +75,8 @@ File.open(pathname + '/' + filename).each do |l|
     if match  = l[/^Date: (.*)/, 1]
       d_created_at = match
       begin
-        d_created_at = ((Date.parse d_created_at) >> 1).strftime("%Y-%m-01")
-        project_month = d_created_at
+        d_created_at = (Date.parse d_created_at).strftime("%Y-%m-%d")
+        project_month = ((Date.parse d_created_at) >> 1).strftime("%Y-%m-01")
       rescue ArgumentError
         d_created_at = project_month
       end
