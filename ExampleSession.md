@@ -15,6 +15,11 @@ mkdir pma
 mkdir pma/emails
 mkdir pma/issues
 ```
+### Clone a local copy of the phpmyadmin repo: 
+```
+git clone https://github.com/phpmyadmin/phpmyadmin
+```
+
 ## change directories to where you’ve got the git repo cloned
 ```
 cd ../phpmyadmin
@@ -35,10 +40,6 @@ cp commits.txt ../SPEFTools.rb/pma
 npm install cloc -g
 ```
 
-### and you’ll need to clone phpmyadmin: 
-```
-git clone https://github.com/phpmyadmin/phpmyadmin
-```
 ### In the phpmyadmin repo directory, referencing the SPEFTools.rb directory…
 ```
 $ ruby ../SPEFTools.rb/extract_sloc.rb phpMyAdmin 2001 04 2015 11
@@ -128,7 +129,6 @@ gunzip pma/emails *.gz
 ruby extract_email.rb pma/emails phpMyAdmin > pma/emails.csv
 ```
 
-## Add header to emails.csv: ProjectMonth,Project,Topic,Source,DocId,reporter,creator,assignee
 ## After all that, your project data directory should look something close to this:
 
 ```
