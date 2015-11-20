@@ -18,17 +18,12 @@ for issue in `seq 1 1000`; do ruby get_git_issue.rb phpmyadmin/phpmyadmin pjmorr
 
 ruby extract_issue.rb phpMyAdmin pma/issues > pma/issues.csv
 
-# Add header line: 
-# ProjectMonth,EventDate,Project,Topic,Source,DocId,creator,assignee,
-
 # getting, summarizing emails
 mkdir pma/emails
 cd pma/emails
 wget https://lists.phpmyadmin.net/pipermail/developers/2014-January.txt.gz
 
-ruby extract_email.rb pma/emails phpMyAdmin > pma/emails.csv
-
-# Add header to emails.csv: 
-# ProjectMonth,Project,Topic,Source,DocId,reporter,creator,assignee
+cd ../..
+ruby extract_email.rb phpMyAdmin pma/emails > pma/emails.csv
 
 
