@@ -126,7 +126,7 @@ gunzip pma/emails *.gz
 
 ## summarize the emails:
 ```
-ruby extract_email.rb pma/emails phpMyAdmin > pma/emails.csv
+ruby extract_email.rb phpMyAdmin pma/emails > pma/emails.csv
 ```
 
 ## After all that, your project data directory should look something close to this:
@@ -148,11 +148,11 @@ ggplot(data=spdf[as.Date(spdf$ProjectMonth) %in% seq(from=as.Date("2001-04-01"),
 
 # plotting practice keyword counts from issues
 ```
-ggplot(data=pmaC[as.Date(projIssues$ProjectMonth) %in% seq(from=as.Date("2005-01-01"), to=as.Date("2014-04-01"),by='month'),],aes(x=ProjectMonth)) + geom_bar(aes(y=..count..,group=Practice),position=position_dodge()) + facet_grid(Practice~.) + theme_tufte() + theme(strip.text.y = element_text(angle=0))
+ggplot(data=projIssues[as.Date(projIssues$ProjectMonth) %in% seq(from=as.Date("2005-01-01"), to=as.Date("2014-04-01"),by='month'),],aes(x=ProjectMonth)) + geom_bar(aes(y=..count..,group=Practice),position=position_dodge()) + facet_grid(Practice~.) + theme_tufte() + theme(strip.text.y = element_text(angle=0))
 ```
 
 # plotting practice keyword counts from emails
 ```
-ggplot(data=pmaC[as.Date(projEmails$ProjectMonth) %in% seq(from=as.Date("2005-01-01"), to=as.Date("2014-04-01"),by='month'),],aes(x=ProjectMonth)) + geom_bar(aes(y=..count..,group=Practice),position=position_dodge()) + facet_grid(Practice~.) + theme_tufte() + theme(strip.text.y = element_text(angle=0))
+ggplot(data=projEmails[as.Date(projEmails$ProjectMonth) %in% seq(from=as.Date("2005-01-01"), to=as.Date("2014-04-01"),by='month'),],aes(x=ProjectMonth)) + geom_bar(aes(y=..count..,group=Practice),position=position_dodge()) + facet_grid(Practice~.) + theme_tufte() + theme(strip.text.y = element_text(angle=0))
 ```
 
