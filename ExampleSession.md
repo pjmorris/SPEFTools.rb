@@ -129,7 +129,6 @@ gunzip pma/emails *.gz
 ruby extract_email.rb pma/emails phpMyAdmin > pma/emails.csv
 ```
 
-## Add header to emails.csv: ProjectMonth,Project,Topic,Source,DocId,reporter,creator,assignee
 ## After all that, your project data directory should look something close to this:
 
 ```
