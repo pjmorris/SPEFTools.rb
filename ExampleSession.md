@@ -27,7 +27,7 @@ cd ../phpmyadmin
 ## run before or after sloc snapshot, but not during… you’ll get results for wherever HEAD is, not the final month
 ```
 $ cp ../SPEFTools.rb/gllog.awk .
-$ git log --pretty=format:"%h ; %ad ; %an ; %ae" --numstat --date=short  | awk -f ../gllog.awk |  awk '{ if (length($1) >= 6) print $0 }' > commits.txt
+$ git log --pretty=format:"%h ; %ad ; %an ; %ae ; %B" --numstat --date=short  | awk -f ../gllog.awk |  awk '{ if (length($1) >= 6) print $0 }' > commits.txt
 ```
 ## copy data file to project data directory
 ```
